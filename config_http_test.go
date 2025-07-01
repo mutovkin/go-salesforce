@@ -6,63 +6,6 @@ import (
 	"time"
 )
 
-func TestWithHTTPClient(t *testing.T) {
-	tests := []struct {
-		name     string
-		client   *http.Client
-		wantErr  bool
-		errorMsg string
-	}{
-		{
-			name: "valid_client",
-			client: &http.Client{
-				Timeout: 30 * time.Second,
-			},
-			wantErr: false,
-		},
-		{
-			name:     "nil_client",
-			client:   nil,
-			wantErr:  true,
-			errorMsg: "HTTP client cannot be nil",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			config := &configuration{}
-			option := WithHTTPClient(tt.client)
-			err := option(config)
-
-			if (err != nil) != tt.wantErr {
-				t.Errorf("WithHTTPClient() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-
-			if tt.wantErr && err.Error() != tt.errorMsg {
-				t.Errorf("WithHTTPClient() error message = %v, want %v", err.Error(), tt.errorMsg)
-				return
-			}
-
-			if !tt.wantErr {
-				if config.httpClient != tt.client {
-					t.Errorf(
-						"WithHTTPClient() httpClient = %v, want %v",
-						config.httpClient,
-						tt.client,
-					)
-				}
-				if config.roundTripper != nil {
-					t.Errorf(
-						"WithHTTPClient() should clear roundTripper, got %v",
-						config.roundTripper,
-					)
-				}
-			}
-		})
-	}
-}
-
 func TestWithRoundTripper(t *testing.T) {
 	tests := []struct {
 		name         string
@@ -162,7 +105,7 @@ func TestConfigurationHTTPClientDefaults(t *testing.T) {
 
 	t.Run("with_custom_round_tripper", func(t *testing.T) {
 		config := configuration{}
-		customRT := &http.Transport{MaxIdleConns: 5}
+		customRT := &http.Transport{MaxIdleConns: httpDefaultMaxIdleConnections}
 		config.roundTripper = customRT
 		config.setDefaults()
 		config.configureHttpClient()
@@ -190,7 +133,7 @@ func TestConfigurationHTTPClientDefaults(t *testing.T) {
 
 	t.Run("with_custom_http_client", func(t *testing.T) {
 		config := configuration{}
-		customClient := &http.Client{Timeout: 60 * time.Second}
+		customClient := &http.Client{Timeout: httpDefaultTimeout}
 		config.httpClient = customClient
 		config.setDefaults()
 

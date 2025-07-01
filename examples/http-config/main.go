@@ -11,18 +11,7 @@ import (
 )
 
 func main() {
-	// Example 1: Using a custom HTTP client with timeout and TLS configuration
-	customClient := &http.Client{
-		Timeout: 60 * time.Second,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: false, // Set to true if you need to skip SSL verification
-			},
-			MaxIdleConns:       20,
-			IdleConnTimeout:    90 * time.Second,
-			DisableCompression: false,
-		},
-	}
+	// Example 1: Using a custom transport with timeout and TLS configuration
 
 	creds := salesforce.Creds{
 		Domain:         "your-domain.my.salesforce.com",
@@ -34,7 +23,16 @@ func main() {
 	}
 
 	// Initialize Salesforce client with custom HTTP client
-	sf, err := salesforce.Init(creds, salesforce.WithHTTPClient(customClient))
+	sf, err := salesforce.Init(creds,
+		salesforce.WithRoundTripper(&http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: false, // Set to true if you need to skip SSL verification
+			},
+			MaxIdleConns:       20,
+			IdleConnTimeout:    90 * time.Second,
+			DisableCompression: false,
+		}),
+	)
 	if err != nil {
 		log.Fatal("Failed to initialize Salesforce client:", err)
 	}
@@ -78,7 +76,7 @@ func main() {
 
 	// Example of combining multiple configuration options
 	sf4, err := salesforce.Init(creds,
-		salesforce.WithHTTPClient(customClient),
+		salesforce.WithRoundTripper(http.DefaultTransport),
 		salesforce.WithCompressionHeaders(true),
 		salesforce.WithAPIVersion("v65.0"),
 		salesforce.WithBatchSizeMax(150),

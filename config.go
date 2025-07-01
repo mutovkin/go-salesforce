@@ -3,6 +3,7 @@ package salesforce
 import (
 	"errors"
 	"net/http"
+	"time"
 )
 
 // configuration is now private to enforce functional configuration pattern
@@ -11,9 +12,10 @@ type configuration struct {
 	apiVersion                   string
 	batchSizeMax                 int
 	bulkBatchSizeMax             int
-	httpClient                   *http.Client      // HTTP client to use for requests
+	httpClient                   *http.Client      // HTTP client (created internally)
 	roundTripper                 http.RoundTripper // Custom round tripper
 	shouldValidateAuthentication bool              // Validate session on client creation
+	httpTimeout                  time.Duration     // HTTP client timeout
 }
 
 // setDefaults sets the default configuration values
@@ -23,24 +25,25 @@ func (c *configuration) setDefaults() {
 	c.apiVersion = apiVersion
 	c.batchSizeMax = batchSizeMax
 	c.bulkBatchSizeMax = bulkBatchSizeMax
+	c.httpTimeout = httpDefaultTimeout
 }
 
 func (c *configuration) configureHttpClient() {
 	// Set default HTTP client if none provided
-	if c.httpClient == nil && c.roundTripper == nil {
+	if c.roundTripper == nil {
 		c.httpClient = &http.Client{
-			Timeout: httpDefaultTimeout,
+			Timeout: c.httpTimeout,
 			Transport: &http.Transport{
 				MaxIdleConns:       httpDefaultMaxIdleConnections,
 				IdleConnTimeout:    httpDefaultIdleConnTimeout,
 				DisableCompression: false,
 			},
 		}
-	} else if c.roundTripper != nil {
-		// Use custom round tripper with default timeout
+	} else {
+		// Use custom round tripper with configured timeout
 		c.httpClient = &http.Client{
 			Transport: c.roundTripper,
-			Timeout:   httpDefaultIdleConnTimeout,
+			Timeout:   c.httpTimeout,
 		}
 	}
 }
@@ -89,18 +92,6 @@ func WithBulkBatchSizeMax(size int) Option {
 	}
 }
 
-// WithHTTPClient sets a custom HTTP client for making requests
-func WithHTTPClient(client *http.Client) Option {
-	return func(c *configuration) error {
-		if client == nil {
-			return errors.New("HTTP client cannot be nil")
-		}
-		c.httpClient = client
-		c.roundTripper = nil // Clear round tripper if client is set
-		return nil
-	}
-}
-
 // WithRoundTripper sets a custom round tripper for HTTP requests
 func WithRoundTripper(rt http.RoundTripper) Option {
 	return func(c *configuration) error {
@@ -108,7 +99,17 @@ func WithRoundTripper(rt http.RoundTripper) Option {
 			return errors.New("round tripper cannot be nil")
 		}
 		c.roundTripper = rt
-		c.httpClient = nil // Will be set in setDefaults with the round tripper
+		return nil
+	}
+}
+
+// WithHTTPTimeout sets the HTTP client timeout duration
+func WithHTTPTimeout(timeout time.Duration) Option {
+	return func(c *configuration) error {
+		if timeout <= 0 {
+			return errors.New("HTTP timeout must be greater than 0")
+		}
+		c.httpTimeout = timeout
 		return nil
 	}
 }

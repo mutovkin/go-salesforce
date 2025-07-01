@@ -10,53 +10,6 @@ The Salesforce Go client now supports custom HTTP client configuration, allowing
 
 ## Usage Examples
 
-### Custom HTTP Client
-
-```go
-package main
-
-import (
-    "crypto/tls"
-    "net/http"
-    "time"
-    
-    salesforce "github.com/mutovkin/go-salesforce/v2"
-)
-
-func main() {
-    // Create a custom HTTP client with specific timeout and TLS settings
-    customClient := &http.Client{
-        Timeout: 60 * time.Second,
-        Transport: &http.Transport{
-            TLSClientConfig: &tls.Config{
-                InsecureSkipVerify: false,
-                MinVersion:         tls.VersionTLS12,
-            },
-            MaxIdleConns:       20,
-            IdleConnTimeout:    90 * time.Second,
-            DisableCompression: false,
-        },
-    }
-
-    creds := salesforce.Creds{
-        Domain:         "your-domain.my.salesforce.com",
-        Username:       "your-username", 
-        Password:       "your-password",
-        SecurityToken:  "your-security-token",
-        ConsumerKey:    "your-consumer-key",
-        ConsumerSecret: "your-consumer-secret",
-    }
-
-    // Initialize with custom HTTP client
-    sf, err := salesforce.Init(creds, salesforce.WithHTTPClient(customClient))
-    if err != nil {
-        log.Fatal(err)
-    }
-    
-    // Use the client normally...
-}
-```
-
 ### Custom Round Tripper
 
 ```go
@@ -88,39 +41,12 @@ func main() {
 }
 ```
 
-### Combining Multiple Configuration Options
-
-```go
-func main() {
-    creds := salesforce.Creds{
-        // ... your credentials  
-    }
-
-    customClient := &http.Client{
-        Timeout: 45 * time.Second,
-    }
-
-    // Combine multiple configuration options
-    sf, err := salesforce.Init(creds,
-        salesforce.WithHTTPClient(customClient),
-        salesforce.WithCompressionHeaders(true),
-        salesforce.WithAPIVersion("v65.0"),
-        salesforce.WithBatchSizeMax(150),
-        salesforce.WithBulkBatchSizeMax(5000),
-    )
-    if err != nil {
-        log.Fatal(err)
-    }
-}
-```
-
 ## Configuration Options
 
 ### HTTP Client Options
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `WithHTTPClient(client *http.Client)` | Set a custom HTTP client | Default client with 30s timeout |
 | `WithRoundTripper(rt http.RoundTripper)` | Set a custom round tripper | Default transport |
 
 ### Other Configuration Options
@@ -138,7 +64,7 @@ When no custom HTTP client or round tripper is provided, the library uses:
 
 ```go
 &http.Client{
-    Timeout: 30 * time.Second,
+    Timeout: 60 * time.Second,
     Transport: &http.Transport{
         MaxIdleConns:       10,
         IdleConnTimeout:    30 * time.Second,
@@ -152,7 +78,7 @@ When no custom HTTP client or round tripper is provided, the library uses:
 You can retrieve the current configuration using getter methods:
 
 ```go
-sf, _ := salesforce.Init(creds, salesforce.WithHTTPClient(customClient))
+sf, _ := salesforce.Init(creds)
 
 // Get the configured HTTP client
 client := sf.GetHTTPClient()
