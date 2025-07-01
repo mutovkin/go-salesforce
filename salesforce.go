@@ -8,13 +8,14 @@ import (
 	"reflect"
 	"slices"
 	"strconv"
+	"time"
 
 	"github.com/forcedotcom/go-soql"
 )
 
 type Salesforce struct {
 	auth     *authentication
-	config   configuration
+	config   *configuration
 	AuthFlow AuthFlowType
 }
 
@@ -37,12 +38,15 @@ type SalesforceResults struct {
 }
 
 const (
-	apiVersion            = "v63.0"
-	jsonType              = "application/json"
-	csvType               = "text/csv"
-	batchSizeMax          = 200
-	bulkBatchSizeMax      = 10000
-	invalidSessionIdError = "INVALID_SESSION_ID"
+	apiVersion                    = "v63.0"
+	jsonType                      = "application/json"
+	csvType                       = "text/csv"
+	batchSizeMax                  = 200
+	bulkBatchSizeMax              = 10000
+	invalidSessionIdError         = "INVALID_SESSION_ID"
+	httpDefaultMaxIdleConnections = 10
+	httpDefaultIdleConnTimeout    = time.Duration(30 * time.Second)
+	httpDefaultTimeout            = time.Duration(60 * time.Second)
 )
 
 func validateOfTypeSlice(data any) error {
@@ -165,6 +169,19 @@ func Init(creds Creds, options ...Option) (*Salesforce, error) {
 	var err error
 	var authFlow AuthFlowType
 
+	// Initialize configuration with defaults
+	config := &configuration{}
+	config.setDefaults()
+
+	// Apply functional options
+	for _, option := range options {
+		if err := option(config); err != nil {
+			return nil, fmt.Errorf("configuration error: %w", err)
+		}
+	}
+
+	config.configureHttpClient()
+
 	if creds == (Creds{}) {
 		return nil, errors.New("creds is empty")
 	}
@@ -189,7 +206,7 @@ func Init(creds Creds, options ...Option) (*Salesforce, error) {
 		)
 		authFlow = AuthFlowClientCredentials
 	} else if creds.AccessToken != "" {
-		auth, err = setAccessToken(
+		auth, err = config.getAccessTokenAuthentication(
 			creds.Domain,
 			creds.AccessToken,
 		)
@@ -213,17 +230,6 @@ func Init(creds Creds, options ...Option) (*Salesforce, error) {
 	}
 	auth.creds = creds
 
-	// Initialize configuration with defaults
-	config := configuration{}
-	config.setDefaults()
-
-	// Apply functional options
-	for _, option := range options {
-		if err := option(&config); err != nil {
-			return nil, fmt.Errorf("configuration error: %w", err)
-		}
-	}
-
 	return &Salesforce{
 		auth:     auth,
 		config:   config,
@@ -237,7 +243,7 @@ func (sf *Salesforce) DoRequest(method string, uri string, body []byte) (*http.R
 		return nil, authErr
 	}
 
-	resp, err := doRequest(sf.auth, requestPayload{
+	resp, err := doRequest(sf.auth, sf.config, requestPayload{
 		method:   method,
 		uri:      uri,
 		content:  jsonType,
@@ -835,6 +841,11 @@ func (sf *Salesforce) GetBulkBatchSizeMax() int {
 // GetCompressionHeaders returns whether compression headers are enabled
 func (sf *Salesforce) GetCompressionHeaders() bool {
 	return sf.config.compressionHeaders
+}
+
+// GetHTTPClient returns the configured HTTP client
+func (sf *Salesforce) GetHTTPClient() *http.Client {
+	return sf.config.httpClient
 }
 
 func (sf *Salesforce) GetAccessToken() string {

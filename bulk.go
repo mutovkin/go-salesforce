@@ -69,7 +69,7 @@ var appFs = afero.NewOsFs() // afero.Fs type is a wrapper around os functions, a
 func updateJobState(job bulkJob, state string, sf *Salesforce) error {
 	job.State = state
 	body, _ := json.Marshal(job)
-	_, err := doRequest(sf.auth, requestPayload{
+	_, err := doRequest(sf.auth, sf.config, requestPayload{
 		method:   http.MethodPatch,
 		uri:      "/jobs/ingest/" + job.Id,
 		content:  jsonType,
@@ -84,7 +84,7 @@ func updateJobState(job bulkJob, state string, sf *Salesforce) error {
 }
 
 func createBulkJob(sf *Salesforce, jobType string, body []byte) (bulkJob, error) {
-	resp, err := doRequest(sf.auth, requestPayload{
+	resp, err := doRequest(sf.auth, sf.config, requestPayload{
 		method:   http.MethodPost,
 		uri:      "/jobs/" + jobType,
 		content:  jsonType,
@@ -110,7 +110,7 @@ func createBulkJob(sf *Salesforce, jobType string, body []byte) (bulkJob, error)
 }
 
 func uploadJobData(sf *Salesforce, data string, bulkJob bulkJob) error {
-	_, uploadDataErr := doRequest(sf.auth, requestPayload{
+	_, uploadDataErr := doRequest(sf.auth, sf.config, requestPayload{
 		method:   http.MethodPut,
 		uri:      "/jobs/ingest/" + bulkJob.Id + "/batches",
 		content:  csvType,
@@ -132,7 +132,7 @@ func uploadJobData(sf *Salesforce, data string, bulkJob bulkJob) error {
 }
 
 func getJobResults(sf *Salesforce, jobType string, bulkJobId string) (BulkJobResults, error) {
-	resp, err := doRequest(sf.auth, requestPayload{
+	resp, err := doRequest(sf.auth, sf.config, requestPayload{
 		method:   http.MethodGet,
 		uri:      "/jobs/" + jobType + "/" + bulkJobId,
 		content:  jsonType,
@@ -175,7 +175,7 @@ func getBulkJobRecords(
 	bulkJobId string,
 	resultType string,
 ) ([]map[string]any, error) {
-	resp, err := doRequest(sf.auth, requestPayload{
+	resp, err := doRequest(sf.auth, sf.config, requestPayload{
 		method:   http.MethodGet,
 		uri:      "/jobs/ingest/" + bulkJobId + "/" + resultType,
 		content:  jsonType,
@@ -262,6 +262,7 @@ func getQueryJobResults(
 	}
 	resp, err := doRequest(
 		sf.auth,
+		sf.config,
 		requestPayload{
 			method:   http.MethodGet,
 			uri:      uri,

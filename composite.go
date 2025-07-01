@@ -38,7 +38,7 @@ func doCompositeRequest(sf *Salesforce, compReq compositeRequest) (SalesforceRes
 	if jsonErr != nil {
 		return SalesforceResults{}, jsonErr
 	}
-	resp, httpErr := doRequest(sf.auth, requestPayload{
+	resp, httpErr := doRequest(sf.auth, sf.config, requestPayload{
 		method:   http.MethodPost,
 		uri:      "/composite",
 		content:  jsonType,

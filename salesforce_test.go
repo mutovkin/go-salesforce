@@ -50,8 +50,9 @@ func setupTestServer(body any, status int) (*httptest.Server, authentication) {
 }
 
 func buildSalesforceStruct(auth *authentication) *Salesforce {
-	config := configuration{}
+	config := &configuration{}
 	config.setDefaults()
+	config.configureHttpClient()
 	return &Salesforce{
 		auth:     auth,
 		config:   config,
@@ -59,7 +60,7 @@ func buildSalesforceStruct(auth *authentication) *Salesforce {
 	}
 }
 
-func buildSalesforceStructWithConfig(auth *authentication, config configuration) *Salesforce {
+func buildSalesforceStructWithConfig(auth *authentication, config *configuration) *Salesforce {
 	return &Salesforce{
 		auth:     auth,
 		config:   config,
@@ -423,7 +424,8 @@ func Test_validateCollections(t *testing.T) {
 			args: args{
 				sf: *buildSalesforceStruct(&authentication{
 					AccessToken: "1234",
-				}),
+				},
+				),
 				records:   []account{},
 				batchSize: 200,
 			},
@@ -441,9 +443,12 @@ func Test_validateCollections(t *testing.T) {
 		{
 			name: "validation_fail_type",
 			args: args{
-				sf: Salesforce{auth: &authentication{
-					AccessToken: "1234",
-				}},
+				sf: Salesforce{
+					auth: &authentication{
+						AccessToken: "1234",
+					},
+					config: getDefaultConfig(),
+				},
 				records:   0,
 				batchSize: 200,
 			},
@@ -452,9 +457,12 @@ func Test_validateCollections(t *testing.T) {
 		{
 			name: "validation_fail_batch_size",
 			args: args{
-				sf: Salesforce{auth: &authentication{
-					AccessToken: "1234",
-				}},
+				sf: Salesforce{
+					auth: &authentication{
+						AccessToken: "1234",
+					},
+					config: getDefaultConfig(),
+				},
 				records:   []account{},
 				batchSize: 0,
 			},
@@ -515,9 +523,12 @@ func Test_validateBulk(t *testing.T) {
 		{
 			name: "validation_fail_type",
 			args: args{
-				sf: Salesforce{auth: &authentication{
-					AccessToken: "1234",
-				}},
+				sf: Salesforce{
+					auth: &authentication{
+						AccessToken: "1234",
+					},
+					config: getDefaultConfig(),
+				},
 				records:          0,
 				batchSize:        10000,
 				isFile:           false,
@@ -529,9 +540,12 @@ func Test_validateBulk(t *testing.T) {
 		{
 			name: "validation_fail_batch_size",
 			args: args{
-				sf: Salesforce{auth: &authentication{
-					AccessToken: "1234",
-				}},
+				sf: Salesforce{
+					auth: &authentication{
+						AccessToken: "1234",
+					},
+					config: getDefaultConfig(),
+				},
 				records:          []account{},
 				batchSize:        0,
 				isFile:           false,
@@ -573,7 +587,9 @@ func Test_validateBulk(t *testing.T) {
 			args: args{
 				sf: *buildSalesforceStruct(&authentication{
 					AccessToken: "1234",
-				}),
+				},
+				),
+
 				records:          nil,
 				batchSize:        2000,
 				isFile:           true,

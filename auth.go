@@ -79,11 +79,11 @@ func validateAuth(sf Salesforce) error {
 	return nil
 }
 
-func validateSession(auth authentication) error {
+func (conf *configuration) validateAuthentication(auth authentication) error {
 	if err := validateAuth(Salesforce{auth: &auth}); err != nil {
 		return err
 	}
-	_, err := doRequest(&auth, requestPayload{
+	_, err := doRequest(&auth, conf, requestPayload{
 		method:  http.MethodGet,
 		uri:     "/limits",
 		content: jsonType,
@@ -212,10 +212,15 @@ func clientCredentialsFlow(
 	return auth, nil
 }
 
-func setAccessToken(domain string, accessToken string) (*authentication, error) {
+func (conf *configuration) getAccessTokenAuthentication(
+	domain string,
+	accessToken string,
+) (*authentication, error) {
 	auth := &authentication{InstanceUrl: domain, AccessToken: accessToken}
-	if err := validateSession(*auth); err != nil {
-		return nil, err
+	if conf.shouldValidateAuthentication {
+		if err := conf.validateAuthentication(*auth); err != nil {
+			return nil, err
+		}
 	}
 	auth.grantType = grantTypeAccessToken
 	return auth, nil

@@ -29,3 +29,4 @@ mod-upgrade:
 test:
 	go test ./... -v
 
+.PHONY: all tidy generate build install-tools fmt lint mod-upgrade test

@@ -236,7 +236,9 @@ func Test_setAccessToken(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := setAccessToken(tt.args.domain, tt.args.accessToken)
+			config := getDefaultConfig()
+			config.shouldValidateAuthentication = true
+			got, err := config.getAccessTokenAuthentication(tt.args.domain, tt.args.accessToken)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("setAccessToken() error = %v, wantErr %v", err, tt.wantErr)
 				return

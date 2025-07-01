@@ -1,13 +1,19 @@
 package salesforce
 
-import "errors"
+import (
+	"errors"
+	"net/http"
+)
 
 // configuration is now private to enforce functional configuration pattern
 type configuration struct {
-	compressionHeaders bool // compress request and response if true to save bandwidth
-	apiVersion         string
-	batchSizeMax       int
-	bulkBatchSizeMax   int
+	compressionHeaders           bool // compress request and response if true to save bandwidth
+	apiVersion                   string
+	batchSizeMax                 int
+	bulkBatchSizeMax             int
+	httpClient                   *http.Client      // HTTP client to use for requests
+	roundTripper                 http.RoundTripper // Custom round tripper
+	shouldValidateAuthentication bool              // Validate session on client creation
 }
 
 // setDefaults sets the default configuration values
@@ -16,6 +22,26 @@ func (c *configuration) setDefaults() {
 	c.apiVersion = apiVersion
 	c.batchSizeMax = batchSizeMax
 	c.bulkBatchSizeMax = bulkBatchSizeMax
+}
+
+func (c *configuration) configureHttpClient() {
+	// Set default HTTP client if none provided
+	if c.httpClient == nil && c.roundTripper == nil {
+		c.httpClient = &http.Client{
+			Timeout: httpDefaultTimeout,
+			Transport: &http.Transport{
+				MaxIdleConns:       httpDefaultMaxIdleConnections,
+				IdleConnTimeout:    httpDefaultIdleConnTimeout,
+				DisableCompression: false,
+			},
+		}
+	} else if c.roundTripper != nil {
+		// Use custom round tripper with default timeout
+		c.httpClient = &http.Client{
+			Transport: c.roundTripper,
+			Timeout:   httpDefaultIdleConnTimeout,
+		}
+	}
 }
 
 // Option is a functional configuration option that can return an error
@@ -60,4 +86,44 @@ func WithBulkBatchSizeMax(size int) Option {
 		c.bulkBatchSizeMax = size
 		return nil
 	}
+}
+
+// WithHTTPClient sets a custom HTTP client for making requests
+func WithHTTPClient(client *http.Client) Option {
+	return func(c *configuration) error {
+		if client == nil {
+			return errors.New("HTTP client cannot be nil")
+		}
+		c.httpClient = client
+		c.roundTripper = nil // Clear round tripper if client is set
+		return nil
+	}
+}
+
+// WithRoundTripper sets a custom round tripper for HTTP requests
+func WithRoundTripper(rt http.RoundTripper) Option {
+	return func(c *configuration) error {
+		if rt == nil {
+			return errors.New("round tripper cannot be nil")
+		}
+		c.roundTripper = rt
+		c.httpClient = nil // Will be set in setDefaults with the round tripper
+		return nil
+	}
+}
+
+// WithValidateAuthentication sets whether to validate the authentication session on client creation
+func WithValidateAuthentication(validate bool) Option {
+	return func(c *configuration) error {
+		c.shouldValidateAuthentication = validate
+		return nil
+	}
+}
+
+// getDefaultConfig returns a default configuration for internal use
+func getDefaultConfig() *configuration {
+	config := &configuration{}
+	config.setDefaults()
+	config.configureHttpClient()
+	return config
 }
