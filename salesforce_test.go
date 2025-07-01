@@ -60,14 +60,6 @@ func buildSalesforceStruct(auth *authentication) *Salesforce {
 	}
 }
 
-func buildSalesforceStructWithConfig(auth *authentication, config *configuration) *Salesforce {
-	return &Salesforce{
-		auth:     auth,
-		config:   config,
-		AuthFlow: AuthFlowAccessToken,
-	}
-}
-
 func Test_validateOfTypeSlice(t *testing.T) {
 	type args struct {
 		data any
@@ -447,7 +439,7 @@ func Test_validateCollections(t *testing.T) {
 					auth: &authentication{
 						AccessToken: "1234",
 					},
-					config: getDefaultConfig(),
+					config: getDefaultConfig(t),
 				},
 				records:   0,
 				batchSize: 200,
@@ -461,7 +453,7 @@ func Test_validateCollections(t *testing.T) {
 					auth: &authentication{
 						AccessToken: "1234",
 					},
-					config: getDefaultConfig(),
+					config: getDefaultConfig(t),
 				},
 				records:   []account{},
 				batchSize: 0,
@@ -527,7 +519,7 @@ func Test_validateBulk(t *testing.T) {
 					auth: &authentication{
 						AccessToken: "1234",
 					},
-					config: getDefaultConfig(),
+					config: getDefaultConfig(t),
 				},
 				records:          0,
 				batchSize:        10000,
@@ -544,7 +536,7 @@ func Test_validateBulk(t *testing.T) {
 					auth: &authentication{
 						AccessToken: "1234",
 					},
-					config: getDefaultConfig(),
+					config: getDefaultConfig(t),
 				},
 				records:          []account{},
 				batchSize:        0,

@@ -119,11 +119,3 @@ func WithValidateAuthentication(validate bool) Option {
 		return nil
 	}
 }
-
-// getDefaultConfig returns a default configuration for internal use
-func getDefaultConfig() *configuration {
-	config := &configuration{}
-	config.setDefaults()
-	config.configureHttpClient()
-	return config
-}
