@@ -134,7 +134,7 @@ func TestConfigurationHTTPClientDefaults(t *testing.T) {
 			t.Errorf(
 				"setDefaults() HTTP client timeout = %v, want %v",
 				config.httpClient.Timeout,
-				30*time.Second,
+				httpDefaultTimeout,
 			)
 		}
 
@@ -179,11 +179,11 @@ func TestConfigurationHTTPClientDefaults(t *testing.T) {
 			)
 		}
 
-		if config.httpClient.Timeout != 30*time.Second {
+		if config.httpClient.Timeout != httpDefaultTimeout {
 			t.Errorf(
 				"setDefaults() HTTP client timeout = %v, want %v",
 				config.httpClient.Timeout,
-				30*time.Second,
+				httpDefaultTimeout,
 			)
 		}
 	})
