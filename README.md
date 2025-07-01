@@ -1,10 +1,19 @@
 # go-salesforce
 
+---
+
+- This is a fork of the main repository https://github.com/k-capehart/go-salesforce
+- Goal of this fork to add some flexibility to the library for my particular use cases
+- I've re-formatted the codebase using go community formatting tools, so pushing upstream is really hard
+  - Reformatting such that I don't have to remember which format to follow
+- I attempt to bring changes from upstream down here when they happen
+
+---
+
 A REST API wrapper for interacting with Salesforce using the Go programming language.
 
 [![GoDoc](https://godoc.org/github.com/k-capehart/go-salesforce/v2?status.png)](https://pkg.go.dev/github.com/k-capehart/go-salesforce/v2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/k-capehart/go-salesforce)](https://goreportcard.com/report/github.com/k-capehart/go-salesforce)
-[![codecov](https://codecov.io/gh/k-capehart/go-salesforce/graph/badge.svg?token=20V6A05GMH)](https://codecov.io/gh/k-capehart/go-salesforce)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/k-capehart/go-salesforce/blob/main/LICENSE)
 [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 
