@@ -35,7 +35,11 @@ func TestWithCompressionHeaders(t *testing.T) {
 			}
 
 			if config.compressionHeaders != tt.compression {
-				t.Errorf("WithCompressionHeaders() = %v, want %v", config.compressionHeaders, tt.compression)
+				t.Errorf(
+					"WithCompressionHeaders() = %v, want %v",
+					config.compressionHeaders,
+					tt.compression,
+				)
 			}
 		})
 	}
@@ -167,7 +171,11 @@ func TestWithBulkBatchSizeMax(t *testing.T) {
 			}
 
 			if !tt.wantErr && config.bulkBatchSizeMax != tt.wantValue {
-				t.Errorf("WithBulkBatchSizeMax() = %v, want %v", config.bulkBatchSizeMax, tt.wantValue)
+				t.Errorf(
+					"WithBulkBatchSizeMax() = %v, want %v",
+					config.bulkBatchSizeMax,
+					tt.wantValue,
+				)
 			}
 		})
 	}
@@ -178,7 +186,10 @@ func TestConfigurationDefaults(t *testing.T) {
 	config.setDefaults()
 
 	if config.compressionHeaders != false {
-		t.Errorf("Expected compressionHeaders default to be false, got %v", config.compressionHeaders)
+		t.Errorf(
+			"Expected compressionHeaders default to be false, got %v",
+			config.compressionHeaders,
+		)
 	}
 
 	if config.apiVersion != apiVersion {
@@ -186,10 +197,18 @@ func TestConfigurationDefaults(t *testing.T) {
 	}
 
 	if config.batchSizeMax != batchSizeMax {
-		t.Errorf("Expected batchSizeMax default to be %v, got %v", batchSizeMax, config.batchSizeMax)
+		t.Errorf(
+			"Expected batchSizeMax default to be %v, got %v",
+			batchSizeMax,
+			config.batchSizeMax,
+		)
 	}
 
 	if config.bulkBatchSizeMax != bulkBatchSizeMax {
-		t.Errorf("Expected bulkBatchSizeMax default to be %v, got %v", bulkBatchSizeMax, config.bulkBatchSizeMax)
+		t.Errorf(
+			"Expected bulkBatchSizeMax default to be %v, got %v",
+			bulkBatchSizeMax,
+			config.bulkBatchSizeMax,
+		)
 	}
 }
