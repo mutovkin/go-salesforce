@@ -29,7 +29,7 @@ func performQuery(sf *Salesforce, query string, sObject any) error {
 			method:   http.MethodGet,
 			uri:      queryResp.NextRecordsUrl,
 			content:  jsonType,
-			compress: sf.Config.CompressionHeaders,
+			compress: sf.config.compressionHeaders,
 		})
 		if err != nil {
 			return err

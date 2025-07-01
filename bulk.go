@@ -74,7 +74,7 @@ func updateJobState(job bulkJob, state string, sf *Salesforce) error {
 		uri:      "/jobs/ingest/" + job.Id,
 		content:  jsonType,
 		body:     string(body),
-		compress: sf.Config.CompressionHeaders,
+		compress: sf.config.compressionHeaders,
 	})
 	if err != nil {
 		return err
@@ -89,7 +89,7 @@ func createBulkJob(sf *Salesforce, jobType string, body []byte) (bulkJob, error)
 		uri:      "/jobs/" + jobType,
 		content:  jsonType,
 		body:     string(body),
-		compress: sf.Config.CompressionHeaders,
+		compress: sf.config.compressionHeaders,
 	})
 	if err != nil {
 		return bulkJob{}, err
@@ -115,7 +115,7 @@ func uploadJobData(sf *Salesforce, data string, bulkJob bulkJob) error {
 		uri:      "/jobs/ingest/" + bulkJob.Id + "/batches",
 		content:  csvType,
 		body:     data,
-		compress: sf.Config.CompressionHeaders,
+		compress: sf.config.compressionHeaders,
 	})
 	if uploadDataErr != nil {
 		if err := updateJobState(bulkJob, jobStateAborted, sf); err != nil {
@@ -136,7 +136,7 @@ func getJobResults(sf *Salesforce, jobType string, bulkJobId string) (BulkJobRes
 		method:   http.MethodGet,
 		uri:      "/jobs/" + jobType + "/" + bulkJobId,
 		content:  jsonType,
-		compress: sf.Config.CompressionHeaders,
+		compress: sf.config.compressionHeaders,
 	})
 	if err != nil {
 		return BulkJobResults{}, err
@@ -179,7 +179,7 @@ func getBulkJobRecords(
 		method:   http.MethodGet,
 		uri:      "/jobs/ingest/" + bulkJobId + "/" + resultType,
 		content:  jsonType,
-		compress: sf.Config.CompressionHeaders,
+		compress: sf.config.compressionHeaders,
 	})
 	if err != nil {
 		return nil, err
@@ -266,7 +266,7 @@ func getQueryJobResults(
 			method:   http.MethodGet,
 			uri:      uri,
 			content:  jsonType,
-			compress: sf.Config.CompressionHeaders,
+			compress: sf.config.compressionHeaders,
 		},
 	)
 	if err != nil {

@@ -88,7 +88,7 @@ func doBatchedRequestsForCollection(
 			uri:      url,
 			content:  jsonType,
 			body:     string(body),
-			compress: sf.Config.CompressionHeaders,
+			compress: sf.config.compressionHeaders,
 		})
 		if err != nil {
 			return SalesforceResults{Results: results}, err
@@ -135,7 +135,7 @@ func doInsertOne(sf *Salesforce, sObjectName string, record any) (SalesforceResu
 		uri:      "/sobjects/" + sObjectName,
 		content:  jsonType,
 		body:     string(body),
-		compress: sf.Config.CompressionHeaders,
+		compress: sf.config.compressionHeaders,
 	})
 	if err != nil {
 		return SalesforceResult{}, err
@@ -174,7 +174,7 @@ func doUpdateOne(sf *Salesforce, sObjectName string, record any) error {
 		uri:      "/sobjects/" + sObjectName + "/" + recordId,
 		content:  jsonType,
 		body:     string(body),
-		compress: sf.Config.CompressionHeaders,
+		compress: sf.config.compressionHeaders,
 	})
 	if err != nil {
 		return err
@@ -217,7 +217,7 @@ func doUpsertOne(
 		uri:      "/sobjects/" + sObjectName + "/" + fieldName + "/" + externalIdValue,
 		content:  jsonType,
 		body:     string(body),
-		compress: sf.Config.CompressionHeaders,
+		compress: sf.config.compressionHeaders,
 	})
 	if err != nil {
 		return SalesforceResult{}, err
@@ -247,7 +247,7 @@ func doDeleteOne(sf *Salesforce, sObjectName string, record any) error {
 		method:   http.MethodDelete,
 		uri:      "/sobjects/" + sObjectName + "/" + recordId,
 		content:  jsonType,
-		compress: sf.Config.CompressionHeaders,
+		compress: sf.config.compressionHeaders,
 	})
 	if err != nil {
 		return err
@@ -379,7 +379,7 @@ func doDeleteCollection(
 			method:   http.MethodDelete,
 			uri:      "/composite/sobjects/?ids=" + batchedIds[i] + "&allOrNone=false",
 			content:  jsonType,
-			compress: sf.Config.CompressionHeaders,
+			compress: sf.config.compressionHeaders,
 		})
 		if err != nil {
 			return SalesforceResults{Results: results}, err

@@ -43,7 +43,7 @@ func doCompositeRequest(sf *Salesforce, compReq compositeRequest) (SalesforceRes
 		uri:      "/composite",
 		content:  jsonType,
 		body:     string(body),
-		compress: sf.Config.CompressionHeaders,
+		compress: sf.config.compressionHeaders,
 	})
 	if httpErr != nil {
 		return SalesforceResults{}, httpErr

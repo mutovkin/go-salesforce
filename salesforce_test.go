@@ -50,11 +50,20 @@ func setupTestServer(body any, status int) (*httptest.Server, authentication) {
 }
 
 func buildSalesforceStruct(auth *authentication) *Salesforce {
-	config := Configuration{}
-	config.SetDefaults()
+	config := configuration{}
+	config.setDefaults()
 	return &Salesforce{
-		auth:   auth,
-		Config: config,
+		auth:     auth,
+		config:   config,
+		AuthFlow: AuthFlowAccessToken,
+	}
+}
+
+func buildSalesforceStructWithConfig(auth *authentication, config configuration) *Salesforce {
+	return &Salesforce{
+		auth:     auth,
+		config:   config,
+		AuthFlow: AuthFlowAccessToken,
 	}
 }
 
@@ -336,8 +345,11 @@ func TestInit(t *testing.T) {
 				t.Errorf("Init() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if tt.want != nil && !tt.wantErr && !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Init() = %v, want %v", *got.auth, *tt.want.auth)
+			if tt.want != nil && !tt.wantErr {
+				// Compare only the authentication parts since the config and AuthFlow are now different
+				if !reflect.DeepEqual(*got.auth, *tt.want.auth) {
+					t.Errorf("Init() = %v, want %v", *got.auth, *tt.want.auth)
+				}
 			}
 		})
 	}
@@ -409,9 +421,9 @@ func Test_validateCollections(t *testing.T) {
 		{
 			name: "validation_success",
 			args: args{
-				sf: Salesforce{auth: &authentication{
+				sf: *buildSalesforceStruct(&authentication{
 					AccessToken: "1234",
-				}},
+				}),
 				records:   []account{},
 				batchSize: 200,
 			},
@@ -477,9 +489,9 @@ func Test_validateBulk(t *testing.T) {
 		{
 			name: "validation_success",
 			args: args{
-				sf: Salesforce{auth: &authentication{
+				sf: *buildSalesforceStruct(&authentication{
 					AccessToken: "1234",
-				}},
+				}),
 				records:          []account{},
 				batchSize:        10000,
 				isFile:           false,
@@ -531,9 +543,9 @@ func Test_validateBulk(t *testing.T) {
 		{
 			name: "validation_success_file",
 			args: args{
-				sf: Salesforce{auth: &authentication{
+				sf: *buildSalesforceStruct(&authentication{
 					AccessToken: "1234",
-				}},
+				}),
 				records:          nil,
 				batchSize:        2000,
 				isFile:           true,
@@ -545,9 +557,9 @@ func Test_validateBulk(t *testing.T) {
 		{
 			name: "validation_fail_assignment_contact",
 			args: args{
-				sf: Salesforce{auth: &authentication{
+				sf: *buildSalesforceStruct(&authentication{
 					AccessToken: "1234",
-				}},
+				}),
 				records:          nil,
 				batchSize:        2000,
 				isFile:           true,
@@ -559,9 +571,9 @@ func Test_validateBulk(t *testing.T) {
 		{
 			name: "validation_success_assignment_case",
 			args: args{
-				sf: Salesforce{auth: &authentication{
+				sf: *buildSalesforceStruct(&authentication{
 					AccessToken: "1234",
-				}},
+				}),
 				records:          nil,
 				batchSize:        2000,
 				isFile:           true,

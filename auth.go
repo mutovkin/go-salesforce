@@ -14,6 +14,32 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// AuthFlowType represents the type of authentication flow used
+type AuthFlowType int
+
+const (
+	AuthFlowUnknown AuthFlowType = iota
+	AuthFlowUsernamePassword
+	AuthFlowClientCredentials
+	AuthFlowAccessToken
+	AuthFlowJWT
+)
+
+func (a AuthFlowType) String() string {
+	switch a {
+	case AuthFlowUsernamePassword:
+		return "Username/Password"
+	case AuthFlowClientCredentials:
+		return "Client Credentials"
+	case AuthFlowAccessToken:
+		return "Access Token"
+	case AuthFlowJWT:
+		return "JWT"
+	default:
+		return "Unknown"
+	}
+}
+
 type authentication struct {
 	AccessToken string `json:"access_token"`
 	InstanceUrl string `json:"instance_url"`
