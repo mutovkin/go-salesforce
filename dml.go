@@ -125,7 +125,11 @@ func decodeResponseBody(response *http.Response) (value SalesforceResult, err er
 	return value, err
 }
 
-func (sf *Salesforce) doInsertOne(ctx context.Context, sObjectName string, record any) (SalesforceResult, error) {
+func (sf *Salesforce) doInsertOne(
+	ctx context.Context,
+	sObjectName string,
+	record any,
+) (SalesforceResult, error) {
 	recordMap, err := convertToMap(record)
 	if err != nil {
 		return SalesforceResult{}, err

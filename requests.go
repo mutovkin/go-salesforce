@@ -62,7 +62,7 @@ func doRequest(
 		return resp, err
 	}
 	if resp.StatusCode < 200 || resp.StatusCode > 300 {
-		resp, err = processSalesforceError(*resp, auth, config, payload)
+		resp, err = processSalesforceError(ctx, *resp, auth, config, payload)
 		if err != nil {
 			return resp, err
 		}
@@ -106,6 +106,7 @@ func decompress(body io.ReadCloser) (io.ReadCloser, error) {
 }
 
 func processSalesforceError(
+	ctx context.Context,
 	resp http.Response,
 	auth *authentication,
 	config *configuration,
@@ -128,6 +129,7 @@ func processSalesforceError(
 				return &resp, err
 			}
 			newResp, err := doRequest(
+				ctx,
 				auth,
 				config,
 				requestPayload{

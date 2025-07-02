@@ -34,7 +34,10 @@ type compositeSubRequestResult struct {
 	ReferenceId    string             `json:"referenceId"`
 }
 
-func (sf *Salesforce) doCompositeRequest(ctx context.Context, compReq compositeRequest) (SalesforceResults, error) {
+func (sf *Salesforce) doCompositeRequest(
+	ctx context.Context,
+	compReq compositeRequest,
+) (SalesforceResults, error) {
 	body, jsonErr := json.Marshal(compReq)
 	if jsonErr != nil {
 		return SalesforceResults{}, jsonErr

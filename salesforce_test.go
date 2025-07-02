@@ -651,7 +651,7 @@ func TestSalesforce_DoRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			got, err := sf.DoRequest(tt.args.method, tt.args.uri, tt.args.body)
+			got, err := sf.DoRequest(t.Context(), tt.args.method, tt.args.uri, tt.args.body)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.DoRequest() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -736,7 +736,7 @@ func TestSalesforce_Query(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			if err := sf.Query(tt.args.query, tt.args.sObject); (err != nil) != tt.wantErr {
+			if err := sf.Query(t.Context(), tt.args.query, tt.args.sObject); (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.Query() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.args.sObject, &tt.want) {
@@ -807,7 +807,7 @@ func TestSalesforce_QueryStruct(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			if err := sf.QueryStruct(tt.args.soqlStruct, tt.args.sObject); (err != nil) != tt.wantErr {
+			if err := sf.QueryStruct(t.Context(), tt.args.soqlStruct, tt.args.sObject); (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.QueryStruct() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.args.sObject, &tt.want) {
@@ -875,7 +875,7 @@ func TestSalesforce_InsertOne(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			got, err := sf.InsertOne(tt.args.sObjectName, tt.args.record)
+			got, err := sf.InsertOne(t.Context(), tt.args.sObjectName, tt.args.record)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.InsertOne() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -949,7 +949,7 @@ func TestSalesforce_UpdateOne(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			if err := sf.UpdateOne(tt.args.sObjectName, tt.args.record); (err != nil) != tt.wantErr {
+			if err := sf.UpdateOne(t.Context(), tt.args.sObjectName, tt.args.record); (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.UpdateOne() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1035,6 +1035,7 @@ func TestSalesforce_UpsertOne(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpsertOne(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.externalIdFieldName,
 				tt.args.record,
@@ -1108,7 +1109,7 @@ func TestSalesforce_DeleteOne(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			if err := sf.DeleteOne(tt.args.sObjectName, tt.args.record); (err != nil) != tt.wantErr {
+			if err := sf.DeleteOne(t.Context(), tt.args.sObjectName, tt.args.record); (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.DeleteOne() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -1206,7 +1207,7 @@ func TestSalesforce_InsertCollection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			got, err := sf.InsertCollection(tt.args.sObjectName, tt.args.records, tt.args.batchSize)
+			got, err := sf.InsertCollection(t.Context(), tt.args.sObjectName, tt.args.records, tt.args.batchSize)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.InsertCollection() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -1309,7 +1310,7 @@ func TestSalesforce_UpdateCollection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			got, err := sf.UpdateCollection(tt.args.sObjectName, tt.args.records, tt.args.batchSize)
+			got, err := sf.UpdateCollection(t.Context(), tt.args.sObjectName, tt.args.records, tt.args.batchSize)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.UpdateCollection() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -1417,6 +1418,7 @@ func TestSalesforce_UpsertCollection(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpsertCollection(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.externalIdFieldName,
 				tt.args.records,
@@ -1514,7 +1516,7 @@ func TestSalesforce_DeleteCollection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			got, err := sf.DeleteCollection(tt.args.sObjectName, tt.args.records, tt.args.batchSize)
+			got, err := sf.DeleteCollection(t.Context(), tt.args.sObjectName, tt.args.records, tt.args.batchSize)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.DeleteCollection() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -1625,6 +1627,7 @@ func TestSalesforce_InsertComposite(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.InsertComposite(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.records,
 				tt.args.batchSize,
@@ -1742,6 +1745,7 @@ func TestSalesforce_UpdateComposite(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpdateComposite(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.records,
 				tt.args.batchSize,
@@ -1863,6 +1867,7 @@ func TestSalesforce_UpsertComposite(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpsertComposite(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.externalIdFieldName,
 				tt.args.records,
@@ -1972,6 +1977,7 @@ func TestSalesforce_DeleteComposite(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.DeleteComposite(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.records,
 				tt.args.batchSize,
@@ -2054,6 +2060,7 @@ func TestSalesforce_InsertBulk(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.InsertBulk(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.records,
 				tt.args.batchSize,
@@ -2145,6 +2152,7 @@ func TestSalesforce_InsertBulkAssign(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.InsertBulkAssign(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.records,
 				tt.args.batchSize,
@@ -2230,6 +2238,7 @@ func TestSalesforce_UpdateBulk(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpdateBulk(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.records,
 				tt.args.batchSize,
@@ -2326,6 +2335,7 @@ func TestSalesforce_UpdateBulkAssign(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpdateBulkAssign(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.records,
 				tt.args.batchSize,
@@ -2414,6 +2424,7 @@ func TestSalesforce_UpsertBulk(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpsertBulk(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.externalIdFieldName,
 				tt.args.records,
@@ -2514,6 +2525,7 @@ func TestSalesforce_UpsertBulkAssign(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpsertBulkAssign(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.externalIdFieldName,
 				tt.args.records,
@@ -2597,6 +2609,7 @@ func TestSalesforce_DeleteBulk(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.DeleteBulk(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.records,
 				tt.args.batchSize,
@@ -2661,7 +2674,7 @@ func TestSalesforce_GetJobResults(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			got, err := sf.GetJobResults(tt.args.bulkJobId)
+			got, err := sf.GetJobResults(t.Context(), tt.args.bulkJobId)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.GetJobResults() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -2738,6 +2751,7 @@ func TestSalesforce_InsertBulkFile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.InsertBulkFile(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.filePath,
 				tt.args.batchSize,
@@ -2822,6 +2836,7 @@ func TestSalesforce_InsertBulkFileAssign(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.InsertBulkFileAssign(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.filePath,
 				tt.args.batchSize,
@@ -2908,6 +2923,7 @@ func TestSalesforce_UpdateBulkFile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpdateBulkFile(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.filePath,
 				tt.args.batchSize,
@@ -2992,6 +3008,7 @@ func TestSalesforce_UpdateBulkFileAssign(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpdateBulkFileAssign(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.filePath,
 				tt.args.batchSize,
@@ -3081,6 +3098,7 @@ func TestSalesforce_UpsertBulkFile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpsertBulkFile(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.externalIdFieldName,
 				tt.args.filePath,
@@ -3169,6 +3187,7 @@ func TestSalesforce_UpsertBulkFileAssign(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.UpsertBulkFileAssign(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.externalIdFieldName,
 				tt.args.filePath,
@@ -3256,6 +3275,7 @@ func TestSalesforce_DeleteBulkFile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
 			got, err := sf.DeleteBulkFile(
+				t.Context(),
 				tt.args.sObjectName,
 				tt.args.filePath,
 				tt.args.batchSize,
@@ -3352,7 +3372,7 @@ func TestSalesforce_QueryBulkExport(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			if err := sf.QueryBulkExport(tt.args.query, tt.args.filePath); (err != nil) != tt.wantErr {
+			if err := sf.QueryBulkExport(t.Context(), tt.args.query, tt.args.filePath); (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.QueryBulkExport() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -3443,7 +3463,7 @@ func TestSalesforce_QueryStructBulkExport(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			if err := sf.QueryStructBulkExport(tt.args.soqlStruct, tt.args.filePath); (err != nil) != tt.wantErr {
+			if err := sf.QueryStructBulkExport(t.Context(), tt.args.soqlStruct, tt.args.filePath); (err != nil) != tt.wantErr {
 				t.Errorf(
 					"Salesforce.QueryStructBulkExport() error = %v, wantErr %v",
 					err,
@@ -3539,12 +3559,12 @@ func TestSalesforce_CreateQueryBulkJob(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			it, err := sf.QueryBulkIterator(tt.args.query)
+			it, err := sf.QueryBulkIterator(t.Context(), tt.args.query)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Salesforce.CreateQueryBulkJob() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if it != nil {
-				for it.Next() {
+				for it.Next(t.Context()) {
 					if err := it.Decode(&tt.args.val); (err != nil) != tt.wantErr {
 						t.Fatalf(
 							"Salesforce.IteratorJob.Decode() error = %v, wantErr %v",
@@ -3556,7 +3576,7 @@ func TestSalesforce_CreateQueryBulkJob(t *testing.T) {
 						t.Fatalf("Salesforce.IteratorJob.Val() val don't match")
 					}
 				}
-				if err := it.Error(); (err != nil) != tt.wantErr {
+				if err := it.Error(t.Context()); (err != nil) != tt.wantErr {
 					t.Fatalf(
 						"Salesforce.IteratorJob.Error() error = %v, wantErr %v",
 						err,
