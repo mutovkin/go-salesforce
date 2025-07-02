@@ -47,7 +47,6 @@ const (
 	invalidSessionIdError         = "INVALID_SESSION_ID"
 	httpDefaultMaxIdleConnections = 10
 	httpDefaultIdleConnTimeout    = time.Duration(30 * time.Second)
-	httpDefaultTimeout            = time.Duration(120 * time.Second)
 )
 
 func validateOfTypeSlice(data any) error {
