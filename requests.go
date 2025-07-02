@@ -3,6 +3,7 @@ package salesforce
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -20,6 +21,7 @@ type requestPayload struct {
 }
 
 func doRequest(
+	ctx context.Context,
 	auth *authentication,
 	config *configuration,
 	payload requestPayload,
@@ -38,9 +40,9 @@ func doRequest(
 		} else {
 			reader = strings.NewReader(payload.body)
 		}
-		req, err = http.NewRequest(payload.method, endpoint, reader)
+		req, err = http.NewRequestWithContext(ctx, payload.method, endpoint, reader)
 	} else {
-		req, err = http.NewRequest(payload.method, endpoint, nil)
+		req, err = http.NewRequestWithContext(ctx, payload.method, endpoint, nil)
 	}
 	if err != nil {
 		return nil, err

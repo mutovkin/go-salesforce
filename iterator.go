@@ -1,6 +1,7 @@
 package salesforce
 
 import (
+	"context"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -39,7 +40,7 @@ func newBulkJobQueryIterator(sf *Salesforce, bulkJobId string) (*bulkJobQueryIte
 	}, nil
 }
 
-func (it *bulkJobQueryIterator) Next() bool {
+func (it *bulkJobQueryIterator) Next(ctx context.Context) bool {
 	if it.reader != nil {
 		it.err = it.reader.Close()
 		if it.Locator == "" {
