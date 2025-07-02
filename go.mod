@@ -1,4 +1,4 @@
-module github.com/mutovkin/go-salesforce/v2
+module github.com/mutovkin/go-salesforce/v300
 
 go 1.24.4
 
