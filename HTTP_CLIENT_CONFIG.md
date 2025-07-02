@@ -94,7 +94,6 @@ compressionEnabled := sf.GetCompressionHeaders()
 
 - The `doRequest` function now uses the configured HTTP client instead of `http.DefaultClient`
 - The API version from configuration is used in all endpoint URLs
-- When both `WithHTTPClient()` and `WithRoundTripper()` are used, the last one takes precedence
 - Custom configurations are validated during initialization to prevent runtime errors
 
 ## Migration from Previous Versions
