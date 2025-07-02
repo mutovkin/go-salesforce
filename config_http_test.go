@@ -191,3 +191,112 @@ func TestSalesforceAPIVersionInRequests(t *testing.T) {
 		t.Errorf("config.apiVersion = %v, want %v", sf.config.apiVersion, customVersion)
 	}
 }
+
+func TestWithHTTPTimeout(t *testing.T) {
+	tests := []struct {
+		name     string
+		timeout  time.Duration
+		wantErr  bool
+		errorMsg string
+	}{
+		{
+			name:    "valid_timeout",
+			timeout: 30 * time.Second,
+			wantErr: false,
+		},
+		{
+			name:    "valid_timeout_1_second",
+			timeout: 1 * time.Second,
+			wantErr: false,
+		},
+		{
+			name:    "valid_timeout_1_minute",
+			timeout: 1 * time.Minute,
+			wantErr: false,
+		},
+		{
+			name:     "zero_timeout",
+			timeout:  0,
+			wantErr:  true,
+			errorMsg: "HTTP timeout must be greater than 0",
+		},
+		{
+			name:     "negative_timeout",
+			timeout:  -1 * time.Second,
+			wantErr:  true,
+			errorMsg: "HTTP timeout must be greater than 0",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config := &configuration{}
+			config.setDefaults() // Set defaults to have a baseline
+			option := WithHTTPTimeout(tt.timeout)
+			err := option(config)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("WithHTTPTimeout() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if tt.wantErr && err.Error() != tt.errorMsg {
+				t.Errorf("WithHTTPTimeout() error message = %v, want %v", err.Error(), tt.errorMsg)
+				return
+			}
+
+			if !tt.wantErr {
+				if config.httpTimeout != tt.timeout {
+					t.Errorf(
+						"WithHTTPTimeout() httpTimeout = %v, want %v",
+						config.httpTimeout,
+						tt.timeout,
+					)
+				}
+			}
+		})
+	}
+}
+
+func TestWithValidateAuthentication(t *testing.T) {
+	tests := []struct {
+		name     string
+		validate bool
+		wantErr  bool
+	}{
+		{
+			name:     "validate_true",
+			validate: true,
+			wantErr:  false,
+		},
+		{
+			name:     "validate_false",
+			validate: false,
+			wantErr:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config := &configuration{}
+			config.setDefaults() // Set defaults to have a baseline
+			option := WithValidateAuthentication(tt.validate)
+			err := option(config)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("WithValidateAuthentication() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !tt.wantErr {
+				if config.shouldValidateAuthentication != tt.validate {
+					t.Errorf(
+						"WithValidateAuthentication() shouldValidateAuthentication = %v, want %v",
+						config.shouldValidateAuthentication,
+						tt.validate,
+					)
+				}
+			}
+		})
+	}
+}

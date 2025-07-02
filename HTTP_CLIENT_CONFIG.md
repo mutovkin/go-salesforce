@@ -2,11 +2,11 @@
 
 ## Overview
 
-The Salesforce Go client now supports custom HTTP client configuration, allowing you to:
+The Salesforce Go client now supports custom HTTP transport layer configuration, allowing you to:
 
-1. **Provide a custom `http.Client`** - Full control over HTTP client settings including timeouts, TLS configuration, connection pooling, etc.
-2. **Provide a custom `http.RoundTripper`** - Lower-level control over HTTP request/response cycle
-3. **Use default HTTP client** - Sensible defaults are provided when no custom configuration is specified
+1. **Provide a custom `http.RoundTripper`** - Lower-level control over HTTP request/response cycle
+    - `http.RoundTripper` can be layered to allow for logging, observability, etc layers for each request
+2. **Use default HTTP client** - Sensible defaults are provided when no custom configuration is specified
 
 ## Usage Examples
 
@@ -60,11 +60,11 @@ func main() {
 
 ## Default HTTP Client Configuration
 
-When no custom HTTP client or round tripper is provided, the library uses:
+When no custom round tripper is provided, the library uses:
 
 ```go
 &http.Client{
-    Timeout: 60 * time.Second,
+    Timeout: 120 * time.Second,
     Transport: &http.Transport{
         MaxIdleConns:       10,
         IdleConnTimeout:    30 * time.Second,
