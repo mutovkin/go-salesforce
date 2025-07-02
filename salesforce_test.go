@@ -1207,7 +1207,12 @@ func TestSalesforce_InsertCollection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			got, err := sf.InsertCollection(t.Context(), tt.args.sObjectName, tt.args.records, tt.args.batchSize)
+			got, err := sf.InsertCollection(
+				t.Context(),
+				tt.args.sObjectName,
+				tt.args.records,
+				tt.args.batchSize,
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.InsertCollection() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -1310,7 +1315,12 @@ func TestSalesforce_UpdateCollection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			got, err := sf.UpdateCollection(t.Context(), tt.args.sObjectName, tt.args.records, tt.args.batchSize)
+			got, err := sf.UpdateCollection(
+				t.Context(),
+				tt.args.sObjectName,
+				tt.args.records,
+				tt.args.batchSize,
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.UpdateCollection() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -1516,7 +1526,12 @@ func TestSalesforce_DeleteCollection(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sf := buildSalesforceStruct(tt.fields.auth)
-			got, err := sf.DeleteCollection(t.Context(), tt.args.sObjectName, tt.args.records, tt.args.batchSize)
+			got, err := sf.DeleteCollection(
+				t.Context(),
+				tt.args.sObjectName,
+				tt.args.records,
+				tt.args.batchSize,
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Salesforce.DeleteCollection() error = %v, wantErr %v", err, tt.wantErr)
 			}
