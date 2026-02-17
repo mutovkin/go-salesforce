@@ -20,13 +20,15 @@ type configuration struct {
 	httpTimeout                  time.Duration     // HTTP client timeout
 }
 
+// setDefaults sets the default configuration values
 func (c *configuration) setDefaults() {
 	c.compressionHeaders = false
 	c.shouldValidateAuthentication = true // Default to validating authentication
 	c.apiVersion = apiVersion
 	c.batchSizeMax = batchSizeMax
 	c.bulkBatchSizeMax = bulkBatchSizeMax
-	c.httpTimeout = httpDefaultTimeout
+	c.httpTimeout = 0    // Default to no timeout (can be set via WithHTTPTimeout option)
+	c.roundTripper = nil // No custom round tripper by default
 }
 
 func (c *configuration) configureHttpClient() {
@@ -66,7 +68,7 @@ func WithAPIVersion(version string) Option {
 		if version == "" {
 			return errors.New("API version cannot be empty")
 		}
-		formatError := "API version must be of the format v62.0"
+		formatError := "API version must be of the format v66.0"
 		versionNumber, found := strings.CutPrefix(version, "v")
 		if !found {
 			return errors.New(formatError)
@@ -81,6 +83,7 @@ func WithAPIVersion(version string) Option {
 		if _, err := strconv.ParseUint(after, 10, 64); err != nil {
 			return errors.Join(err, errors.New(formatError))
 		}
+
 		c.apiVersion = version
 		return nil
 	}

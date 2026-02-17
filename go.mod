@@ -1,6 +1,6 @@
-module github.com/k-capehart/go-salesforce/v3
+module github.com/mutovkin/go-salesforce/v310
 
-go 1.24.5
+go 1.26
 
 require github.com/forcedotcom/go-soql v0.0.0-20240507183026-011ceab61b9e
 
