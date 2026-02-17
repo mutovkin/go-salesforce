@@ -15,7 +15,7 @@ type queryResponse struct {
 	Records        []map[string]any `json:"records"`
 }
 
-func performQuery(sf *Salesforce, query string, sObject any) error {
+func (sf *Salesforce) performQuery(query string, sObject any) error {
 	query = url.QueryEscape(query)
 	queryResp := &queryResponse{
 		Done:           false,

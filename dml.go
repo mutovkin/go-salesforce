@@ -56,8 +56,7 @@ func processSalesforceResponse(resp http.Response) ([]SalesforceResult, error) {
 	return results, nil
 }
 
-func doBatchedRequestsForCollection(
-	sf *Salesforce,
+func (sf *Salesforce) doBatchedRequestsForCollection(
 	method string,
 	url string,
 	batchSize int,
@@ -180,7 +179,7 @@ func convertToString(value any) (string, bool) {
 	}
 }
 
-func doInsertOne(sf *Salesforce, sObjectName string, record any) (SalesforceResult, error) {
+func (sf *Salesforce) doInsertOne(sObjectName string, record any) (SalesforceResult, error) {
 	recordMap, err := convertToMap(record)
 	if err != nil {
 		return SalesforceResult{}, err
@@ -213,7 +212,7 @@ func doInsertOne(sf *Salesforce, sObjectName string, record any) (SalesforceResu
 	return data, nil
 }
 
-func doUpdateOne(sf *Salesforce, sObjectName string, record any) error {
+func (sf *Salesforce) doUpdateOne(sObjectName string, record any) error {
 	recordMap, err := convertToMap(record)
 	if err != nil {
 		return err
@@ -246,8 +245,7 @@ func doUpdateOne(sf *Salesforce, sObjectName string, record any) error {
 	return nil
 }
 
-func doUpsertOne(
-	sf *Salesforce,
+func (sf *Salesforce) doUpsertOne(
 	sObjectName string,
 	fieldName string,
 	record any,
@@ -302,7 +300,7 @@ func doUpsertOne(
 	return data, nil
 }
 
-func doDeleteOne(sf *Salesforce, sObjectName string, record any) error {
+func (sf *Salesforce) doDeleteOne(sObjectName string, record any) error {
 	recordMap, err := convertToMap(record)
 	if err != nil {
 		return err
@@ -326,8 +324,7 @@ func doDeleteOne(sf *Salesforce, sObjectName string, record any) error {
 	return nil
 }
 
-func doInsertCollection(
-	sf *Salesforce,
+func (sf *Salesforce) doInsertCollection(
 	sObjectName string,
 	records any,
 	batchSize int,
@@ -341,8 +338,7 @@ func doInsertCollection(
 		recordMap[i]["attributes"] = map[string]string{"type": sObjectName}
 	}
 
-	return doBatchedRequestsForCollection(
-		sf,
+	return sf.doBatchedRequestsForCollection(
 		http.MethodPost,
 		"/composite/sobjects/",
 		batchSize,
@@ -350,8 +346,7 @@ func doInsertCollection(
 	)
 }
 
-func doUpdateCollection(
-	sf *Salesforce,
+func (sf *Salesforce) doUpdateCollection(
 	sObjectName string,
 	records any,
 	batchSize int,
@@ -368,8 +363,7 @@ func doUpdateCollection(
 		}
 	}
 
-	return doBatchedRequestsForCollection(
-		sf,
+	return sf.doBatchedRequestsForCollection(
 		http.MethodPatch,
 		"/composite/sobjects/",
 		batchSize,
@@ -377,8 +371,7 @@ func doUpdateCollection(
 	)
 }
 
-func doUpsertCollection(
-	sf *Salesforce,
+func (sf *Salesforce) doUpsertCollection(
 	sObjectName string,
 	fieldName string,
 	records any,
@@ -393,11 +386,10 @@ func doUpsertCollection(
 		return SalesforceResults{}, err
 	}
 	uri := "/composite/sobjects/" + sObjectName + "/" + fieldName
-	return doBatchedRequestsForCollection(sf, http.MethodPatch, uri, batchSize, recordMap)
+	return sf.doBatchedRequestsForCollection(http.MethodPatch, uri, batchSize, recordMap)
 }
 
-func doDeleteCollection(
-	sf *Salesforce,
+func (sf *Salesforce) doDeleteCollection(
 	sObjectName string,
 	records any,
 	batchSize int,

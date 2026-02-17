@@ -358,7 +358,7 @@ func Test_doCompositeRequest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := doCompositeRequest(tt.args.sf, tt.args.compReq)
+			got, err := tt.args.sf.doCompositeRequest(tt.args.compReq)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("doCompositeRequest() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -437,8 +437,7 @@ func Test_doInsertComposite(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := doInsertComposite(
-				tt.args.sf,
+			got, err := tt.args.sf.doInsertComposite(
 				tt.args.sObjectName,
 				tt.args.records,
 				tt.args.allOrNone,
@@ -541,8 +540,7 @@ func Test_doUpdateComposite(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := doUpdateComposite(
-				tt.args.sf,
+			got, err := tt.args.sf.doUpdateComposite(
 				tt.args.sObjectName,
 				tt.args.records,
 				tt.args.allOrNone,
@@ -649,8 +647,7 @@ func Test_doUpsertComposite(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := doUpsertComposite(
-				tt.args.sf,
+			got, err := tt.args.sf.doUpsertComposite(
 				tt.args.sObjectName,
 				tt.args.fieldName,
 				tt.args.records,
@@ -769,8 +766,7 @@ func Test_doDeleteComposite(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := doDeleteComposite(
-				tt.args.sf,
+			got, err := tt.args.sf.doDeleteComposite(
 				tt.args.sObjectName,
 				tt.args.records,
 				tt.args.allOrNone,

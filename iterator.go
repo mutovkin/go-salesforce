@@ -27,8 +27,8 @@ type bulkJobQueryIterator struct {
 	config          *configuration
 }
 
-func newBulkJobQueryIterator(sf *Salesforce, bulkJobId string) (*bulkJobQueryIterator, error) {
-	pollErr := waitForJobResults(sf, bulkJobId, queryJobType, (time.Second / 2))
+func (sf *Salesforce) newBulkJobQueryIterator(bulkJobId string) (*bulkJobQueryIterator, error) {
+	pollErr := sf.waitForJobResults(bulkJobId, queryJobType, (time.Second / 2))
 	if pollErr != nil {
 		return nil, pollErr
 	}
