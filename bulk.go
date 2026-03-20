@@ -541,7 +541,13 @@ func (sf *Salesforce) doBulkJob(
 		for _, id := range jobIds {
 			go sf.waitForJobResultsAsync(ctx, id, ingestJobType, c)
 		}
-		jobErrors = <-c
+		// Drain all results: bulk jobs run server-side regardless, so we must
+		// observe every outcome to give the caller a complete error picture.
+		for range jobIds {
+			if err := <-c; err != nil {
+				jobErrors = errors.Join(jobErrors, err)
+			}
+		}
 	}
 
 	return jobIds, jobErrors
@@ -615,7 +621,13 @@ func (sf *Salesforce) doBulkJobWithFile(
 		for _, id := range jobIds {
 			go sf.waitForJobResultsAsync(ctx, id, ingestJobType, c)
 		}
-		jobErrors = <-c
+		// Drain all results: bulk jobs run server-side regardless, so we must
+		// observe every outcome to give the caller a complete error picture.
+		for range jobIds {
+			if err := <-c; err != nil {
+				jobErrors = errors.Join(jobErrors, err)
+			}
+		}
 	}
 
 	return jobIds, jobErrors
