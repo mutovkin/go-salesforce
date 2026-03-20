@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/spf13/afero"
 )
@@ -744,6 +745,8 @@ func Test_waitForJobResultsAsync(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tt.args.sf.config.bulkResultsPollInterval = time.Millisecond
+			tt.args.sf.config.bulkResultsTimeout = time.Second
 			go tt.args.sf.waitForJobResultsAsync(
 				t.Context(),
 				tt.args.bulkJobId,
@@ -810,6 +813,8 @@ func Test_waitForJobResults(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tt.args.sf.config.bulkResultsPollInterval = time.Millisecond
+			tt.args.sf.config.bulkResultsTimeout = time.Second
 			err := tt.args.sf.waitForJobResults(
 				t.Context(),
 				tt.args.bulkJobId,
