@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/jszwec/csvutil"
 )
@@ -32,7 +31,7 @@ func (sf *Salesforce) newBulkJobQueryIterator(
 	ctx context.Context,
 	bulkJobId string,
 ) (*bulkJobQueryIterator, error) {
-	pollErr := sf.waitForJobResults(ctx, bulkJobId, queryJobType, (time.Second / 2))
+	pollErr := sf.waitForJobResults(ctx, bulkJobId, queryJobType)
 	if pollErr != nil {
 		return nil, pollErr
 	}

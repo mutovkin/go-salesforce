@@ -2,6 +2,7 @@ package salesforce
 
 import (
 	"testing"
+	"time"
 )
 
 func TestWithCompressionHeaders(t *testing.T) {
@@ -210,5 +211,117 @@ func TestConfigurationDefaults(t *testing.T) {
 			bulkBatchSizeMax,
 			config.bulkBatchSizeMax,
 		)
+	}
+
+	if config.bulkResultsTimeout != bulkResultsDefaultTimeout {
+		t.Errorf(
+			"Expected bulkResultsTimeout default to be %v, got %v",
+			bulkResultsDefaultTimeout,
+			config.bulkResultsTimeout,
+		)
+	}
+
+	if config.bulkResultsPollInterval != bulkResultsDefaultInterval {
+		t.Errorf(
+			"Expected bulkResultsPollInterval default to be %v, got %v",
+			bulkResultsDefaultInterval,
+			config.bulkResultsPollInterval,
+		)
+	}
+}
+
+func TestWithBulkResultsTimeout(t *testing.T) {
+	tests := []struct {
+		name      string
+		timeout   time.Duration
+		wantErr   bool
+		wantValue time.Duration
+	}{
+		{
+			name:      "valid_timeout",
+			timeout:   5 * time.Minute,
+			wantErr:   false,
+			wantValue: 5 * time.Minute,
+		},
+		{
+			name:    "zero_timeout",
+			timeout: 0,
+			wantErr: true,
+		},
+		{
+			name:    "negative_timeout",
+			timeout: -1 * time.Second,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config := configuration{}
+			config.setDefaults()
+
+			option := WithBulkResultsTimeout(tt.timeout)
+			err := option(&config)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("WithBulkResultsTimeout() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !tt.wantErr && config.bulkResultsTimeout != tt.wantValue {
+				t.Errorf(
+					"WithBulkResultsTimeout() = %v, want %v",
+					config.bulkResultsTimeout,
+					tt.wantValue,
+				)
+			}
+		})
+	}
+}
+
+func TestWithBulkResultsPollInterval(t *testing.T) {
+	tests := []struct {
+		name      string
+		interval  time.Duration
+		wantErr   bool
+		wantValue time.Duration
+	}{
+		{
+			name:      "valid_interval",
+			interval:  2 * time.Second,
+			wantErr:   false,
+			wantValue: 2 * time.Second,
+		},
+		{
+			name:     "zero_interval",
+			interval: 0,
+			wantErr:  true,
+		},
+		{
+			name:     "negative_interval",
+			interval: -1 * time.Millisecond,
+			wantErr:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config := configuration{}
+			config.setDefaults()
+
+			option := WithBulkResultsPollInterval(tt.interval)
+			err := option(&config)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("WithBulkResultsPollInterval() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !tt.wantErr && config.bulkResultsPollInterval != tt.wantValue {
+				t.Errorf(
+					"WithBulkResultsPollInterval() = %v, want %v",
+					config.bulkResultsPollInterval,
+					tt.wantValue,
+				)
+			}
+		})
 	}
 }
