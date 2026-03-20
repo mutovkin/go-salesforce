@@ -8,7 +8,6 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/spf13/afero"
 )
@@ -705,7 +704,6 @@ func Test_waitForJobResultsAsync(t *testing.T) {
 		sf        *Salesforce
 		bulkJobId string
 		jobType   string
-		interval  time.Duration
 		c         chan error
 	}
 	tests := []struct {
@@ -719,7 +717,6 @@ func Test_waitForJobResultsAsync(t *testing.T) {
 				sf:        buildSalesforceStruct(&sfAuth),
 				bulkJobId: "1234",
 				jobType:   ingestJobType,
-				interval:  time.Nanosecond,
 				c:         make(chan error),
 			},
 			wantErr: false,
@@ -730,7 +727,6 @@ func Test_waitForJobResultsAsync(t *testing.T) {
 				sf:        buildSalesforceStruct(&sfAuth),
 				bulkJobId: "1234",
 				jobType:   queryJobType,
-				interval:  time.Nanosecond,
 				c:         make(chan error),
 			},
 			wantErr: false,
@@ -741,7 +737,6 @@ func Test_waitForJobResultsAsync(t *testing.T) {
 				sf:        buildSalesforceStruct(&badSfAuth),
 				bulkJobId: "",
 				jobType:   queryJobType,
-				interval:  time.Nanosecond,
 				c:         make(chan error),
 			},
 			wantErr: true,
@@ -753,7 +748,6 @@ func Test_waitForJobResultsAsync(t *testing.T) {
 				t.Context(),
 				tt.args.bulkJobId,
 				tt.args.jobType,
-				tt.args.interval,
 				tt.args.c,
 			)
 			err := <-tt.args.c
@@ -779,7 +773,6 @@ func Test_waitForJobResults(t *testing.T) {
 		sf        *Salesforce
 		bulkJobId string
 		jobType   string
-		interval  time.Duration
 	}
 	tests := []struct {
 		name    string
@@ -793,7 +786,6 @@ func Test_waitForJobResults(t *testing.T) {
 				sf:        buildSalesforceStruct(&sfAuth),
 				bulkJobId: "1234",
 				jobType:   ingestJobType,
-				interval:  time.Nanosecond,
 			},
 			wantErr: false,
 		},
@@ -803,7 +795,6 @@ func Test_waitForJobResults(t *testing.T) {
 				sf:        buildSalesforceStruct(&sfAuth),
 				bulkJobId: "1234",
 				jobType:   queryJobType,
-				interval:  time.Nanosecond,
 			},
 			wantErr: false,
 		},
@@ -813,7 +804,6 @@ func Test_waitForJobResults(t *testing.T) {
 				sf:        buildSalesforceStruct(&badSfAuth),
 				bulkJobId: "",
 				jobType:   queryJobType,
-				interval:  time.Nanosecond,
 			},
 			wantErr: true,
 		},
@@ -824,7 +814,6 @@ func Test_waitForJobResults(t *testing.T) {
 				t.Context(),
 				tt.args.bulkJobId,
 				tt.args.jobType,
-				tt.args.interval,
 			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("waitForQueryResults() error = %v, wantErr %v", err, tt.wantErr)

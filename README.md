@@ -265,6 +265,8 @@ func main() {
 | `WithBulkBatchSizeMax(size int)` | Set max batch size for bulk operations | 10000 |
 | `WithCompressionHeaders(enabled bool)` | Enable/disable compression | false |
 | `WithHTTPTimeout(timeout time.Duration)` | Sets HttpClient's overall timeout value (can also be achieved via Context's deadline) | 0 (no timeout) |
+| `WithBulkResultsTimeout(timeout time.Duration)` | Timeout for polling bulk job results | 1 minute |
+| `WithBulkResultsPollInterval(interval time.Duration)` | Polling interval for checking bulk job results | 500ms |
 | `WithValidateAuthentication(validate bool)` | For JWT flow will make an API call to `/limits` to confirm token is valid | true |
 
 #### Default HTTP Client Configuration

@@ -48,6 +48,8 @@ const (
 	httpDefaultMaxIdleConnections = 10
 	httpDefaultIdleConnTimeout    = time.Duration(30 * time.Second)
 	httpDefaultTimeout            = time.Duration(120 * time.Second)
+	bulkResultsDefaultTimeout     = time.Minute
+	bulkResultsDefaultInterval    = time.Second / 2
 )
 
 func validateOfTypeSlice(data any) error {

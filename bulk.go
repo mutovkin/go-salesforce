@@ -208,13 +208,12 @@ func (sf *Salesforce) waitForJobResultsAsync(
 	ctx context.Context,
 	bulkJobId string,
 	jobType string,
-	interval time.Duration,
 	c chan error,
 ) {
 	err := pollUntilContextTimeout(
 		ctx,
-		interval,
-		time.Minute,
+		sf.config.bulkResultsPollInterval,
+		sf.config.bulkResultsTimeout,
 		func(ctx context.Context) (bool, error) {
 			bulkJob, reqErr := sf.getJobResults(ctx, jobType, bulkJobId)
 			if reqErr != nil {
@@ -230,12 +229,11 @@ func (sf *Salesforce) waitForJobResults(
 	ctx context.Context,
 	bulkJobId string,
 	jobType string,
-	interval time.Duration,
 ) error {
 	err := pollUntilContextTimeout(
 		ctx,
-		interval,
-		time.Minute,
+		sf.config.bulkResultsPollInterval,
+		sf.config.bulkResultsTimeout,
 		func(ctx context.Context) (bool, error) {
 			bulkJob, reqErr := sf.getJobResults(ctx, jobType, bulkJobId)
 			if reqErr != nil {
@@ -541,7 +539,7 @@ func (sf *Salesforce) doBulkJob(
 	if waitForResults {
 		c := make(chan error, len(jobIds))
 		for _, id := range jobIds {
-			go sf.waitForJobResultsAsync(ctx, id, ingestJobType, (time.Second / 2), c)
+			go sf.waitForJobResultsAsync(ctx, id, ingestJobType, c)
 		}
 		jobErrors = <-c
 	}
@@ -615,7 +613,7 @@ func (sf *Salesforce) doBulkJobWithFile(
 	if waitForResults {
 		c := make(chan error, len(jobIds))
 		for _, id := range jobIds {
-			go sf.waitForJobResultsAsync(ctx, id, ingestJobType, (time.Second / 2), c)
+			go sf.waitForJobResultsAsync(ctx, id, ingestJobType, c)
 		}
 		jobErrors = <-c
 	}
@@ -642,7 +640,7 @@ func (sf *Salesforce) doQueryBulk(ctx context.Context, filePath string, query st
 		return newErr
 	}
 
-	pollErr := sf.waitForJobResults(ctx, job.Id, queryJobType, (time.Second / 2))
+	pollErr := sf.waitForJobResults(ctx, job.Id, queryJobType)
 	if pollErr != nil {
 		return pollErr
 	}

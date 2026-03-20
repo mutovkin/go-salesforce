@@ -18,6 +18,8 @@ type configuration struct {
 	roundTripper                 http.RoundTripper // Custom round tripper
 	shouldValidateAuthentication bool              // Validate session on client creation
 	httpTimeout                  time.Duration     // HTTP client timeout
+	bulkResultsTimeout           time.Duration     // Timeout for polling bulk job results
+	bulkResultsPollInterval      time.Duration     // Polling interval for bulk job results
 }
 
 func (c *configuration) setDefaults() {
@@ -27,6 +29,8 @@ func (c *configuration) setDefaults() {
 	c.batchSizeMax = batchSizeMax
 	c.bulkBatchSizeMax = bulkBatchSizeMax
 	c.httpTimeout = httpDefaultTimeout
+	c.bulkResultsTimeout = bulkResultsDefaultTimeout
+	c.bulkResultsPollInterval = bulkResultsDefaultInterval
 }
 
 func (c *configuration) configureHttpClient() {
@@ -126,6 +130,28 @@ func WithHTTPTimeout(timeout time.Duration) Option {
 			return errors.New("HTTP timeout must be greater than 0")
 		}
 		c.httpTimeout = timeout
+		return nil
+	}
+}
+
+// WithBulkResultsTimeout sets the timeout duration for polling bulk job results
+func WithBulkResultsTimeout(timeout time.Duration) Option {
+	return func(c *configuration) error {
+		if timeout <= 0 {
+			return errors.New("bulk results timeout must be greater than 0")
+		}
+		c.bulkResultsTimeout = timeout
+		return nil
+	}
+}
+
+// WithBulkResultsPollInterval sets the polling interval for checking bulk job results
+func WithBulkResultsPollInterval(interval time.Duration) Option {
+	return func(c *configuration) error {
+		if interval <= 0 {
+			return errors.New("bulk results poll interval must be greater than 0")
+		}
+		c.bulkResultsPollInterval = interval
 		return nil
 	}
 }
