@@ -254,6 +254,16 @@ func pollUntilContextTimeout(
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
+	// Check immediately before waiting for the first tick, so we can detect
+	// already-complete jobs without incurring an extra interval of latency.
+	done, err := checkFn(ctx)
+	if err != nil {
+		return err
+	}
+	if done {
+		return nil
+	}
+
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
