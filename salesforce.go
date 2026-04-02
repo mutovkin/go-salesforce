@@ -39,7 +39,7 @@ type SalesforceResults struct {
 }
 
 const (
-	apiVersion                    = "v63.0"
+	apiVersion                    = "v66.0"
 	jsonType                      = "application/json"
 	csvType                       = "text/csv"
 	batchSizeMax                  = 200

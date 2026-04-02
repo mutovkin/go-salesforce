@@ -53,7 +53,7 @@ func main() {
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `WithAPIVersion(version string)` | Set Salesforce API version | v63.0 |
+| `WithAPIVersion(version string)` | Set Salesforce API version | v66.0 |
 | `WithCompressionHeaders(enabled bool)` | Enable/disable compression | false |
 | `WithBatchSizeMax(size int)` | Set max batch size for collections | 200 |
 | `WithBulkBatchSizeMax(size int)` | Set max batch size for bulk operations | 10000 |
